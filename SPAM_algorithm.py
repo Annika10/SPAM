@@ -2,7 +2,6 @@ import numpy as np
 
 
 def bitmap_representation(dataset, list_of_words):
-    pass
     # get highest number of customers sequences
     highest_number_sequences = 0
     customer = dataset[0][0]
@@ -28,6 +27,7 @@ def bitmap_representation(dataset, list_of_words):
 
     current_customer = 1
     current_transaction = -1
+    dict_bitmap = dict()
     for element in list_of_words:
         bitmap = np.zeros((countercustomer, bits))
         for item in dataset:
@@ -39,6 +39,35 @@ def bitmap_representation(dataset, list_of_words):
             if element in item[2]:
                 bitmap[current_customer-1][current_transaction] = 1
         print(element, "has bitmap:", bitmap)
+        dict_bitmap["{" + element + '}'] = bitmap
+    return dict_bitmap
+
+
+def s_step_two_elements(first_array, second_array):
+    # some special kind of inversion of first_array
+    # search for first 1 in bitmap
+    shape_of_first_array = np.shape(first_array)
+    transformed_first_array = np.zeros(shape_of_first_array)
+    for index_subarray in range(len(first_array)):
+        sub_array = first_array[index_subarray]
+        index_array = np.where(sub_array == 1)
+        k = index_array[0][0]
+        for index in range(k+1, len(sub_array)):
+            transformed_first_array[index_subarray][index] = 1
+    # TODO: fix like in paper, but why like this in paper?!
+    print("inversed_first_array", transformed_first_array)
+
+    # bitwise and
+    # convert to int for bitwise and
+    transformed_first_array = transformed_first_array.astype(int)
+    second_array = second_array.astype(int)
+    new_sequence_array = transformed_first_array & second_array
+    print(new_sequence_array)
+    return new_sequence_array
+
+
+def s_step(dict_bitmap):
+    pass
 
 
 if __name__ == "__main__":
@@ -62,5 +91,9 @@ if __name__ == "__main__":
     ]
     ordered_list_of_words = ['a', 'b', 'c', 'd']
 
-    bitmap_representation(dataset_Cid_Tid, ordered_list_of_words)
+    dict_bitmap = bitmap_representation(dataset_Cid_Tid, ordered_list_of_words)
+    print(dict_bitmap)
 
+    first_array = dict_bitmap['{a}']
+    second_array = dict_bitmap['{b}']
+    new_sequence_array = s_step_two_elements(first_array, second_array)
