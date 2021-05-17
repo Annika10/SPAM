@@ -1,5 +1,4 @@
 import numpy as np
-from collections import Counter
 
 
 def bitmap_representation(dataset, list_of_words):
@@ -132,6 +131,10 @@ def check_support(array):
     return support
 
 
+def get_frequent_sequences(dict_bitmap):
+    return list(dict_bitmap.keys())
+
+
 def create_tree(dict_bitmap, ordered_list_of_words, min_sup=2, limit=3):
     """
     creates the tree with frequent sequences as a dictionariy
@@ -249,3 +252,6 @@ if __name__ == "__main__":
     print(dict_bitmap)
 
     dict_bitmap = create_tree(dict_bitmap, ordered_list_of_words, min_sup=minSup, limit=max_number_sequence)
+
+    frequent_sequences = get_frequent_sequences(dict_bitmap)
+    print(frequent_sequences)
