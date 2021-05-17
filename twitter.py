@@ -1,0 +1,1 @@
+from .SPAM_algorithm import create_tree
