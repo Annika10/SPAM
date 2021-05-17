@@ -121,7 +121,7 @@ def i_step_two_elements(first_array, second_array):
     return new_item_array
 
 
-def create_tree(dict_bitmap, limit=3):
+def create_tree(dict_bitmap, ordered_list_of_words, limit=3):
     """
 
     :param dict_bitmap: a dictionary where the key are the lexicographic representation (e.g. [a]) and the values is the bitmap representation
@@ -131,7 +131,10 @@ def create_tree(dict_bitmap, limit=3):
     # dummy bitmap for checking if more extensions are possible
     old_dict_bitmap = dict()
 
-    while old_dict_bitmap != dict_bitmap:
+    # for sequence extension, mark which indexes are already passed by
+    already_passed_indexes = 0
+
+    while not old_dict_bitmap.keys() == dict_bitmap.keys():
 
         # current keys of bitmap
         keys = list(dict_bitmap.keys())
@@ -140,62 +143,65 @@ def create_tree(dict_bitmap, limit=3):
         # create new dictionary where new added extensions are stored
         new_dict_bitmap = dict_bitmap.copy()
 
-        for current_index in range(len(keys)):
+        for current_index in range(already_passed_indexes, len(keys)):
 
             # get bitmap/array of current considered element in the dictionary
             first_dict_index = keys[current_index]
+            print("current_index", first_dict_index)
             first_array = dict_bitmap[first_dict_index]
 
+            ### s-step extension
             # check all extensions with right side of tree
-            for index in range(current_index, len(dict_bitmap)):
+            for word in ordered_list_of_words:
 
                 # second considered element
-                current_dict_index = keys[index]
+                current_word = '[' + word + ']'
 
-                ### s-step extension
+                # break for more than 3 sequences
+                if (first_dict_index.count('[') + word.count('[')) > limit:
+                    break
+
                 # name of new sequence
-                new_index_sequence = first_dict_index + current_dict_index
+                new_index_sequence = first_dict_index + current_word
                 # count number of sequences
                 number_sequence = new_index_sequence.count('[')
                 # if new extension doesn't exists until know and there aren't too many sequence, do extension
                 if not new_index_sequence in keys and number_sequence <= limit:
+                    print("new s-step extension", new_index_sequence)
                     # get bitmap/array of second element (extension)
-                    second_array = dict_bitmap[current_dict_index]
+                    second_array = dict_bitmap[current_word]
                     # perform s-step extension
                     new_sequence_array = s_step_two_elements(first_array, second_array)
                     # add to dictionary
                     new_dict_bitmap[new_index_sequence] = new_sequence_array
 
-                ### i-step extension
-                # name of new sequence
-                new_index_item = first_dict_index[:-1] + ',' + current_dict_index[1:]
+            ### i-step extension
+            for word in ordered_list_of_words:
+                # just double check
+                # break for more than 3 sequences
+                if first_dict_index.count('[') > limit:
+                    break
 
-                # check if new item is already in sequence
-                # split into sequences
-                list_of_new_index_item = new_index_item.split("]")
-                not_in_sequence = True
-                # check for each sequence if there are multiple occurrences of one element
-                for element in list_of_new_index_item:
-                    element = element.replace("[", "")
-                    # list of words/characters
-                    sub_list_of_element = element.split(",")
-                    if len(sub_list_of_element) > 1:
-                        # count occurrence of words
-                        counter = Counter(sub_list_of_element)
-                        for i, j in counter.items():
-                            # if word occurs more than one time in one sequence --> not possible
-                            if j > 1:
-                                not_in_sequence = False
-                # when there are no duplicates of words in one sequence and the new whole sequence doesn't exist until now and the limit isn't reached --> do extension
-                # if not_in_sequence and not new_index_item in keys and number_sequence <= limit:
-                #     # get bitmap/array of second element (extension)
-                #     second_array = dict_bitmap[current_dict_index]
-                #     # perform i-step extension
-                #     new_item_array = i_step_two_elements(first_array, second_array)
-                #     # add to dictionary
-                #     new_dict_bitmap[new_index_item] = new_item_array
+                list_of_current_index = first_dict_index.split("[")
+                get_last_sequence = list_of_current_index[-1][:-1]
+                if word not in get_last_sequence and word > get_last_sequence[-1]:
+                    leading_part = ''
+                    for i in range(len(list_of_current_index) - 1):
+                        if list_of_current_index[i]:
+                            leading_part = leading_part + '[' + list_of_current_index[i]
+
+                    new_index_item = '[' + get_last_sequence + ',' + word + ']'
+                    new_whole_sequence = leading_part + new_index_item
+                    print("new i-step extension", new_whole_sequence)
+                    # get bitmap/array of second element (extension)
+                    second_array = dict_bitmap['[' + word + ']']
+                    # perform i-step extension
+                    new_item_array = i_step_two_elements(first_array, second_array)
+                    # add to dictionary
+                    new_dict_bitmap[new_whole_sequence] = new_item_array
 
         # check if there are any new additions to the dictionary
+        already_passed_indexes = len(dict_bitmap)
         old_dict_bitmap = dict_bitmap.copy()
         dict_bitmap = new_dict_bitmap.copy()
 
@@ -206,7 +212,7 @@ def create_tree(dict_bitmap, limit=3):
 if __name__ == "__main__":
     minSup = 2
     # TODO: to which number?
-    max_size_sequence = 3
+    max_number_sequence = 3
 
     # example dataset from paper
     dataset_sequences = {
@@ -228,4 +234,4 @@ if __name__ == "__main__":
     dict_bitmap = bitmap_representation(dataset_Cid_Tid, ordered_list_of_words)
     print(dict_bitmap)
 
-    dict_bitmap = create_tree(dict_bitmap, limit=3)
+    dict_bitmap = create_tree(dict_bitmap, ordered_list_of_words, limit=max_number_sequence)
