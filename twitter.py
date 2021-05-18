@@ -1,6 +1,8 @@
 from SPAM_algorithm import bitmap_representation
 import csv
 from nltk.corpus import stopwords
+from collections import Counter
+import re
 
 
 def remove_stopwords(tweet_list):
@@ -9,9 +11,12 @@ def remove_stopwords(tweet_list):
     :param tweet_list:
     :return:
     """
+    special_characters = ["\"", "?", ":", "…", "…", "…", "(", ")", "“", "”"]
     new_tweet_list = list()
     for word in tweet_list:
-        if word not in stopwords.words('english'):
+        if word and word not in stopwords.words('english') and not word.isnumeric():
+            for char in special_characters:
+                word = word.replace(char, "")
             new_tweet_list.append(word)
     return new_tweet_list
 
@@ -59,7 +64,9 @@ def read_twitter_csv_into_dataset(username=0, tweet=9, number_of_tweets=100):
                 break
             else:
                 username_string = row[username]
-                tweet_list = row[tweet].lower().split(" ")
+                # remove links
+                tweet_str = re.sub("http(\S)*", "", row[tweet].lower())
+                tweet_list = re.split('\s|,|\.', tweet_str)
                 tweet_list = remove_stopwords(tweet_list)
 
                 if username_string not in dict_of_usernames.keys():
@@ -89,11 +96,9 @@ if __name__ == "__main__":
     # nltk.download('stopwords')
 
     dataset_Cid_Tid, word_list, dict_usernames = read_twitter_csv_into_dataset()
-    print(dataset_Cid_Tid)
-    print(len(word_list))
-
     # sorting
     sorted_dataset_Cid_Tid = sort_and_anonymize_dataset(dataset_Cid_Tid, dict_usernames)
+    print("sorted_dataset_Cid_Tid", sorted_dataset_Cid_Tid)
 
     dict_bitmap = bitmap_representation(sorted_dataset_Cid_Tid, word_list)
-    #print(dict_bitmap)
+    print(dict_bitmap.keys())
