@@ -1,7 +1,6 @@
-from SPAM_algorithm import bitmap_representation
+from SPAM_algorithm import bitmap_representation, create_tree, get_frequent_sequences
 import csv
 from nltk.corpus import stopwords
-from collections import Counter
 import re
 
 
@@ -15,9 +14,12 @@ def remove_stopwords(tweet_list):
     new_tweet_list = list()
     for word in tweet_list:
         if word and word not in stopwords.words('english') and not word.isnumeric():
+            print("word", word)
             for char in special_characters:
                 word = word.replace(char, "")
-            new_tweet_list.append(word)
+            # by replacing possibly no characters left
+            if word:
+                new_tweet_list.append(word)
     return new_tweet_list
 
 
@@ -99,6 +101,20 @@ if __name__ == "__main__":
     # sorting
     sorted_dataset_Cid_Tid = sort_and_anonymize_dataset(dataset_Cid_Tid, dict_usernames)
     print("sorted_dataset_Cid_Tid", sorted_dataset_Cid_Tid)
+    print("word_list", word_list)
 
-    dict_bitmap = bitmap_representation(sorted_dataset_Cid_Tid, word_list)
+    minSup = 2
+    # here is 2 enough because in data set there are not more than two transactions per tweet user
+    max_number_sequence = 2
+
+    dict_bitmap = bitmap_representation(sorted_dataset_Cid_Tid, word_list, minSup)
     print(dict_bitmap.keys())
+    print("lengths of initial number of frequent items", len(dict_bitmap.keys()))
+
+    updated_word_list = list(dict_bitmap.keys())
+    updated_word_list = [element[1:-1] for element in updated_word_list]
+
+    dict_bitmap = create_tree(dict_bitmap, updated_word_list, min_sup=minSup, limit=max_number_sequence)
+
+    frequent_sequences = get_frequent_sequences(dict_bitmap)
+    print(frequent_sequences)

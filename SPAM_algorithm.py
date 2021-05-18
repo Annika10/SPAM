@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def bitmap_representation(dataset, list_of_words):
+def bitmap_representation(dataset, list_of_words, min_sup=2):
     """
     create a bitmap representation (as numpy array) from dataset
     :param dataset: dataset in format cid, tid, elements
@@ -58,8 +58,11 @@ def bitmap_representation(dataset, list_of_words):
                 current_transaction = 0
             if element in item[2]:
                 bitmap[current_customer - 1][current_transaction] = 1
-        print(element, "has bitmap:", bitmap)
-        dict_bitmap["[" + element + ']'] = bitmap
+
+        # only include frequent sequences
+        if check_support(bitmap) > min_sup:
+            print(element, "has bitmap:", bitmap)
+            dict_bitmap["[" + element + ']'] = bitmap
     return dict_bitmap
 
 
@@ -248,7 +251,7 @@ if __name__ == "__main__":
     ]
     ordered_list_of_words = ['a', 'b', 'c', 'd']
 
-    dict_bitmap = bitmap_representation(dataset_Cid_Tid, ordered_list_of_words)
+    dict_bitmap = bitmap_representation(dataset_Cid_Tid, ordered_list_of_words, minSup)
     print(dict_bitmap)
 
     dict_bitmap = create_tree(dict_bitmap, ordered_list_of_words, min_sup=minSup, limit=max_number_sequence)
