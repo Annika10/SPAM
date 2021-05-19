@@ -1,8 +1,7 @@
 import numpy as np
-from collections import Counter
 
 
-def bitmap_representation(dataset, list_of_words):
+def bitmap_representation(dataset, list_of_words, min_sup=2):
     """
     create a bitmap representation (as numpy array) from dataset
     :param dataset: dataset in format cid, tid, elements
@@ -59,8 +58,11 @@ def bitmap_representation(dataset, list_of_words):
                 current_transaction = 0
             if element in item[2]:
                 bitmap[current_customer - 1][current_transaction] = 1
-        print(element, "has bitmap:", bitmap)
-        dict_bitmap["[" + element + ']'] = bitmap
+
+        # only include frequent sequences
+        if check_support(bitmap) >= min_sup:
+            # (element, "has bitmap:", bitmap)
+            dict_bitmap["[" + element + ']'] = bitmap
     return dict_bitmap
 
 
@@ -132,6 +134,10 @@ def check_support(array):
     return support
 
 
+def get_frequent_sequences(dict_bitmap):
+    return list(dict_bitmap.keys())
+
+
 def create_tree(dict_bitmap, ordered_list_of_words, min_sup=2, limit=3):
     """
     creates the tree with frequent sequences as a dictionariy
@@ -152,7 +158,7 @@ def create_tree(dict_bitmap, ordered_list_of_words, min_sup=2, limit=3):
 
         # current keys of bitmap
         keys = list(dict_bitmap.keys())
-        print("keys", keys)
+        # print("keys", keys)
 
         # create new dictionary where new added extensions are stored
         new_dict_bitmap = dict_bitmap.copy()
@@ -162,7 +168,7 @@ def create_tree(dict_bitmap, ordered_list_of_words, min_sup=2, limit=3):
 
             # get bitmap/array of current considered element in the dictionary
             first_dict_index = keys[current_index]
-            print("current_index", first_dict_index)
+            # print("current_index", first_dict_index)
             first_array = dict_bitmap[first_dict_index]
 
             # check all extensions with right side of tree
@@ -182,7 +188,7 @@ def create_tree(dict_bitmap, ordered_list_of_words, min_sup=2, limit=3):
                 number_sequence = new_s_step_extended_sequence.count('[')
                 # if new extension doesn't exists until know and there aren't too many sequence, do extension
                 if not new_s_step_extended_sequence in keys and number_sequence <= limit:
-                    print("new s-step extension", new_s_step_extended_sequence)
+                    # ("new s-step extension", new_s_step_extended_sequence)
                     # get bitmap/array of second element (extension)
                     second_array = dict_bitmap[current_word]
                     # perform s-step extension
@@ -196,7 +202,7 @@ def create_tree(dict_bitmap, ordered_list_of_words, min_sup=2, limit=3):
                 list_of_current_index = first_dict_index.split("[")
                 get_last_sequence = list_of_current_index[-1][:-1]
                 # TODO: change compare operation for real words
-                if word not in get_last_sequence and word > get_last_sequence[-1]:
+                if word not in get_last_sequence and word > get_last_sequence.split(",")[-1]:
                     leading_part = ''
                     for i in range(len(list_of_current_index) - 1):
                         if list_of_current_index[i]:
@@ -204,7 +210,7 @@ def create_tree(dict_bitmap, ordered_list_of_words, min_sup=2, limit=3):
 
                     # name of new sequence
                     new_i_step_extended_sequence = leading_part + '[' + get_last_sequence + ',' + word + ']'
-                    print("new i-step extension", new_i_step_extended_sequence)
+                    # print("new i-step extension", new_i_step_extended_sequence)
                     # get bitmap/array of second element (extension)
                     second_array = dict_bitmap['[' + word + ']']
                     # perform i-step extension
@@ -218,13 +224,12 @@ def create_tree(dict_bitmap, ordered_list_of_words, min_sup=2, limit=3):
         old_dict_bitmap = dict_bitmap.copy()
         dict_bitmap = new_dict_bitmap.copy()
 
-    print("tree", dict_bitmap)
+    # print("tree", dict_bitmap)
     return dict_bitmap
 
 
 if __name__ == "__main__":
     minSup = 2
-    # TODO: to which number?
     # here is 2 enough because in dummy data set only one customer has more than 2 transactions but minsup is higher than 1
     max_number_sequence = 2
 
@@ -245,7 +250,10 @@ if __name__ == "__main__":
     ]
     ordered_list_of_words = ['a', 'b', 'c', 'd']
 
-    dict_bitmap = bitmap_representation(dataset_Cid_Tid, ordered_list_of_words)
+    dict_bitmap = bitmap_representation(dataset_Cid_Tid, ordered_list_of_words, minSup)
     print(dict_bitmap)
 
     dict_bitmap = create_tree(dict_bitmap, ordered_list_of_words, min_sup=minSup, limit=max_number_sequence)
+
+    frequent_sequences = get_frequent_sequences(dict_bitmap)
+    print(frequent_sequences)
