@@ -1,4 +1,6 @@
 import numpy as np
+from matplotlib import pyplot as plt
+from wordcloud import WordCloud
 
 
 def bitmap_representation(dataset, list_of_words, min_sup=2):
@@ -48,6 +50,7 @@ def bitmap_representation(dataset, list_of_words, min_sup=2):
     current_customer = 1
     current_transaction = -1
     dict_bitmap = dict()
+    dict_support = dict()
     for element in list_of_words:
         bitmap = np.zeros((countercustomer, bits))
         for item in dataset:
@@ -60,10 +63,12 @@ def bitmap_representation(dataset, list_of_words, min_sup=2):
                 bitmap[current_customer - 1][current_transaction] = 1
 
         # only include frequent sequences
-        if check_support(bitmap) >= min_sup:
+        current_support = check_support(bitmap)
+        if current_support >= min_sup:
             # (element, "has bitmap:", bitmap)
             dict_bitmap["[" + element + ']'] = bitmap
-    return dict_bitmap
+            dict_support["[" + element + ']'] = current_support
+    return dict_bitmap, dict_support
 
 
 def s_step_two_elements(first_array, second_array):
@@ -125,6 +130,11 @@ def i_step_two_elements(first_array, second_array):
 
 
 def check_support(array):
+    """
+    returns support of an element in the bitmap
+    :param array: bitmap representation of an element
+    :return: support of element
+    """
     support = 0
     for sub_array in array:
         array_ones = np.where(sub_array == 1)
@@ -135,10 +145,49 @@ def check_support(array):
 
 
 def get_frequent_sequences(dict_bitmap):
+    """
+    returns frequent sequences from bitmap
+    :param dict_bitmap: bitmap dictionary
+    :return: keys of bitmap dictionary, which are the frequent word patterns
+    """
     return list(dict_bitmap.keys())
 
 
-def create_tree(dict_bitmap, ordered_list_of_words, min_sup=2, limit=3):
+def plot_frequent_sequence(dict_support):
+    """
+    plot a barplot of frequent sequences
+    :param dict_support: dictionary with frequent sequences and their support
+    """
+
+    if len(dict_support) <= 30:
+        # Create horizontal bars
+        plt.barh(range(len(dict_support)), list(dict_support.values()))
+
+        # Create names on the x-axis
+        plt.yticks(range(len(dict_support)), list(dict_support.keys()))
+
+        # Add title and axis names
+        plt.title('frequent word sequences')
+        plt.xlabel('support')
+        plt.ylabel('word sequences')
+
+        plt.show()
+    else:
+        print("no pretty bar plotting possible with such a high amount of values", len(dict_support))
+
+
+def create_wordcloud(dict_support):
+    """
+    plots wordcloud of frequent sequences
+    :param dict_support: dictionary with frequent sequences and their support
+    """
+    wordcloud = WordCloud(background_color="white",width=1920, height=1080).generate_from_frequencies(dict_support)
+    plt.imshow(wordcloud, interpolation="bilinear")
+    plt.axis("off")
+    plt.show()
+
+
+def create_tree(dict_bitmap, dict_support, ordered_list_of_words, min_sup=2, limit=3):
     """
     creates the tree with frequent sequences as a dictionariy
     :param dict_bitmap: a dictionary where the key are the lexicographic representation (e.g. [a]) and the values is the bitmap representation
@@ -193,9 +242,11 @@ def create_tree(dict_bitmap, ordered_list_of_words, min_sup=2, limit=3):
                     second_array = dict_bitmap[current_word]
                     # perform s-step extension
                     new_sequence_array = s_step_two_elements(first_array, second_array)
-                    if check_support(new_sequence_array) >= min_sup:
+                    current_support = check_support(new_sequence_array)
+                    if current_support >= min_sup:
                         # add to dictionary
                         new_dict_bitmap[new_s_step_extended_sequence] = new_sequence_array
+                        dict_support[new_s_step_extended_sequence] = current_support
 
 
                 ### i-step extension
@@ -215,9 +266,11 @@ def create_tree(dict_bitmap, ordered_list_of_words, min_sup=2, limit=3):
                     second_array = dict_bitmap['[' + word + ']']
                     # perform i-step extension
                     new_item_array = i_step_two_elements(first_array, second_array)
-                    if check_support(new_item_array) >= min_sup:
+                    current_support = check_support(new_item_array)
+                    if current_support >= min_sup:
                         # add to dictionary
                         new_dict_bitmap[new_i_step_extended_sequence] = new_item_array
+                        dict_support[new_i_step_extended_sequence] = current_support
 
         # check if there are any new additions to the dictionary
         already_passed_indexes = len(dict_bitmap)
@@ -225,35 +278,4 @@ def create_tree(dict_bitmap, ordered_list_of_words, min_sup=2, limit=3):
         dict_bitmap = new_dict_bitmap.copy()
 
     # print("tree", dict_bitmap)
-    return dict_bitmap
-
-
-if __name__ == "__main__":
-    minSup = 2
-    # here is 2 enough because in dummy data set only one customer has more than 2 transactions but minsup is higher than 1
-    max_number_sequence = 2
-
-    # example dataset from paper
-    dataset_sequences = {
-        1: [['a', 'b', 'd'], ['b', 'c', 'd'], ['b', 'c', 'd']],
-        2: [['b'], ['a', 'b', 'c']],
-        3: [['a', 'b'], ['b', 'c', 'd']]
-    }
-    dataset_Cid_Tid = [
-        [1, 1, ['a', 'b', 'd']],
-        [1, 3, ['b', 'c', 'd']],
-        [1, 6, ['b', 'c', 'd']],
-        [2, 2, ['b']],
-        [2, 4, ['a', 'b', 'c']],
-        [3, 5, ['a', 'b']],
-        [3, 7, ['b', 'c', 'd']],
-    ]
-    ordered_list_of_words = ['a', 'b', 'c', 'd']
-
-    dict_bitmap = bitmap_representation(dataset_Cid_Tid, ordered_list_of_words, minSup)
-    print(dict_bitmap)
-
-    dict_bitmap = create_tree(dict_bitmap, ordered_list_of_words, min_sup=minSup, limit=max_number_sequence)
-
-    frequent_sequences = get_frequent_sequences(dict_bitmap)
-    print(frequent_sequences)
+    return dict_bitmap, dict_support

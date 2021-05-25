@@ -2,6 +2,10 @@
 
 This project includes an implementation of the [Sequential PAttern Mining(SPAM)](https://dl.acm.org/doi/abs/10.1145/775047.775109) algorithm in Python.
 
+![Alt text](dummy_data_support_2_wordcloud.png)
+![Alt text](dummy_data_support_2_bar.png)
+
+
 ```
 {'[a]': array([ [1., 0., 0., 0.],
                 [0., 1., 0., 0.],
