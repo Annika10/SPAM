@@ -6,7 +6,7 @@ from typing import Any
 def init_bit_appering_and_first_position_sequences(dataset_sequences: dict[int, list[list[str]]], list_of_words: list[str]) \
         -> tuple[dict[Any, ndarray], dict[Any, ndarray], dict[Any, dict[Any, ndarray]]]:
     """
-    
+
     :param dataset_sequences:
     :param list_of_words:
     :return:
