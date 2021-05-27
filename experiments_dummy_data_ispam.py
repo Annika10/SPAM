@@ -1,4 +1,4 @@
-from ISPAM_algorithm import init_bit_appering_and_first_position_sequences
+from ISPAM_algorithm import init_bit_appering_and_first_position_sequences, I_SPAM_algorithm
 
 
 if __name__ == "__main__":
@@ -15,5 +15,6 @@ if __name__ == "__main__":
 
     list_of_words = ['a', 'b', 'c', 'd', 'e']
 
-    init_bit_appering_and_first_position_sequences(dataset_sequences, list_of_words, minSup)
+    appear_dict, fp_dict, bit_dict = init_bit_appering_and_first_position_sequences(dataset_sequences, list_of_words)
 
+    I_SPAM_algorithm(appear_dict, minSup, dataset_sequences, bit_dict, fp_dict)
