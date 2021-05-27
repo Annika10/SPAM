@@ -72,79 +72,123 @@ def I_SPAM_algorithm(appear_dict: dict[Any, ndarray], min_sup, dataset_sequences
             list_l.append(itemk)
     appear_dict = appear_dict_copy.copy()
 
+    i_temp_t_dict = dict()
+    for item_t in list_l:
+        i_temp_t = [x for x in list_l if x > item_t]
+        i_temp_t_dict[item_t] = i_temp_t
+
     for item_t in list_l:
         s_temp_t = list_l
         i_temp_t = [x for x in list_l if x > item_t]
-        print(s_temp_t)
-        print(i_temp_t)
         # Call M_DFS(T, AppearT, FPT, S-temp<T>, I-temp<T>)
-        m_dfs(item_t, appear_dict, fp_dict, s_temp_t, i_temp_t, min_sup, bit_dict)
+        m_dfs(item_t, appear_dict, fp_dict, s_temp_t, min_sup, bit_dict, i_temp_t_dict)
 
 
-def m_dfs(item_t, appear_dict, fp_dict, s_temp_t, i_temp_t, min_sup, bit_dict):
-    print("item_t here", item_t)
+def m_dfs(item_t, appear_dict, fp_dict, s_temp_t, min_sup, bit_dict, i_temp_t_dict):
+    appear_t = appear_dict[item_t].astype(int)
+
+    # s-step
     for s_extension_element in s_temp_t:
         # convert to int for bitwise and
-        print("s_extension_element", s_extension_element)
-        appear_t = appear_dict[item_t].astype(int)
         appear_s_extension_element = appear_dict[s_extension_element].astype(int)
         approximate_appear_t_s = appear_t & appear_s_extension_element
-        print("approximate_appear_t_s", approximate_appear_t_s)
 
         appear_t_s = np.zeros((len(approximate_appear_t_s)))
         fp_t_s = np.zeros((len(approximate_appear_t_s)))
 
         if one_count(approximate_appear_t_s) >= min_sup:
             for bit_k in range(len(approximate_appear_t_s)):
-                print("bit_k", bit_k)
-                print("index von hinten", -(bit_k+1))
+
                 if approximate_appear_t_s[-(bit_k+1)] != 0:
                     fp_item_t = int(fp_dict[item_t][-(bit_k+1)])
                     fp_s = int(fp_dict[s_extension_element][-(bit_k+1)])
-                    print("fp_item_t", fp_item_t)
-                    print("fp_s", fp_s)
+
                     if fp_item_t >= fp_s:
-                        print("bit_dict", bit_dict[bit_k+1])
-                        print("bit_k for dict", bit_k+1)
-                        print("s_extension_element", s_extension_element)
                         bit_s_extension_element = bit_dict[bit_k+1][s_extension_element]
-                        print("bit_s_extension_element", bit_s_extension_element)
 
                         for shifting_number in range(fp_item_t):
-                            print("shifting_number", shifting_number+1)
                             bit_s_extension_element = np.roll(bit_s_extension_element, 1)
                             bit_s_extension_element[0] = 0
-                        print("bit_s_extension_element after shifting", bit_s_extension_element)
 
                         if one_count(bit_s_extension_element) > 0:
                             list_of_ones = np.where(bit_s_extension_element == 1)
-                            print("list_of_ones", list_of_ones)
                             h = len(bit_s_extension_element) - np.max(list_of_ones)
                             appear_t_s[-(bit_k+1)] = 1
                             fp_t_s[-(bit_k+1)] = fp_item_t + h
-                        print("current appear_t_s", appear_t_s)
-                        print("current fp_t_s", fp_t_s)
 
                     else:
                         appear_t_s[-(bit_k + 1)] = 1
                         fp_t_s[-(bit_k + 1)] = fp_s
-                        print("current appear_t_s", appear_t_s)
-                        print("current fp_t_s", fp_t_s)
                 else:
-                    print("or here")
                     appear_t_s[-(bit_k + 1)] = 0
                     fp_t_s[-(bit_k + 1)] = 0
-                    print("current appear_t_s", appear_t_s)
-                    print("current fp_t_s", fp_t_s)
-            print("appear_t_s", appear_t_s)
+
             if one_count(appear_t_s) >= min_sup:
-                print("never goes here")
                 appear_dict[item_t + s_extension_element] = appear_t_s
                 fp_dict[item_t + s_extension_element] = fp_t_s
-                m_dfs(item_t + s_extension_element, appear_dict, fp_dict, s_temp_t, i_temp_t, min_sup, bit_dict)
+                m_dfs(item_t + s_extension_element, appear_dict, fp_dict, s_temp_t, min_sup, bit_dict, i_temp_t_dict)
 
-        print("appear_dict", appear_dict)
-        print("fp_dict", fp_dict)
+
+    # i-step
+    if item_t[-1] == ')':
+        i_temp_t = i_temp_t_dict[item_t[-2]]
+    else:
+        i_temp_t = i_temp_t_dict[item_t[-1]]
+
+    for i_extension_element in i_temp_t:
+        # convert to int for bitwise and
+        appear_i_extension_element = appear_dict[i_extension_element].astype(int)
+        approximate_appear_t_i = appear_t & appear_i_extension_element
+
+        appear_t_i = np.zeros((len(approximate_appear_t_i)))
+        fp_t_i = np.zeros((len(approximate_appear_t_i)))
+
+        if one_count(approximate_appear_t_i) >= min_sup:
+            for bit_k in range(len(approximate_appear_t_i)):
+
+                if approximate_appear_t_i[-(bit_k+1)] != 0:
+                    fp_item_t = int(fp_dict[item_t][-(bit_k+1)])
+                    fp_i = int(fp_dict[i_extension_element][-(bit_k+1)])
+
+                    if fp_item_t == fp_i:
+                        appear_t_i[-(bit_k + 1)] = 1
+                        fp_t_i[-(bit_k + 1)] = fp_item_t
+
+                    else:
+                        last_item = item_t[-1]
+                        if last_item == ')':
+                            last_item = item_t[-2]
+                        last_item_bit = bit_dict[bit_k+1][last_item].astype(int)
+                        i_extension_element_bit = bit_dict[bit_k+1][i_extension_element].astype(int)
+                        and_bit = last_item_bit & i_extension_element_bit
+
+                        if one_count(and_bit) > 0:
+                            shifting_no = fp_item_t - 1
+                            for shifting_number in range(shifting_no):
+                                and_bit = np.roll(and_bit, 1)
+                                and_bit[0] = 0
+
+                            if one_count(and_bit) > 0:
+                                list_of_ones = np.where(and_bit == 1)
+                                h = len(and_bit) - np.max(list_of_ones)
+                                appear_t_i[-(bit_k + 1)] = 1
+                                fp_t_i[-(bit_k + 1)] = shifting_no + h
+
+                else:
+                    appear_t_i[-(bit_k + 1)] = 0
+                    fp_t_i[-(bit_k + 1)] = 0
+
+            if one_count(appear_t_i) >= min_sup:
+                if item_t[-1] == ')':
+                    str_index = item_t[:-1] + i_extension_element + ')'
+                else:
+                    str_index = item_t[:-1] + '(' + item_t[-1] + i_extension_element + ')'
+                appear_dict[str_index] = appear_t_i
+                fp_dict[str_index] = fp_t_i
+                m_dfs(str_index, appear_dict, fp_dict, s_temp_t, min_sup, bit_dict, i_temp_t_dict)
+
+    print("appear_dict", appear_dict)
+    print("fp_dict", fp_dict)
 
 
 def one_count(array):
