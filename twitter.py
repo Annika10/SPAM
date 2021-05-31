@@ -21,7 +21,7 @@ def remove_stopwords(tweet_list):
     return new_tweet_list
 
 
-def sort_and_anonymize_dataset(dataset_Cid_Tid, dict_of_usernames):
+def sort_and_anonymize_dataset(dataset_Cid_Tid, dict_of_usernames, customer_starting_index=1):
     """
     sort dataset that each user's tweets follow up after each other
     :param dataset_Cid_Tid: unsorted dataset
@@ -30,7 +30,7 @@ def sort_and_anonymize_dataset(dataset_Cid_Tid, dict_of_usernames):
     """
     new_dataset_Cid_Tid = list()
     dict_username = dict()
-    current_customer = 0
+    current_customer = customer_starting_index
 
     for element in dataset_Cid_Tid:
         # print("element", element)

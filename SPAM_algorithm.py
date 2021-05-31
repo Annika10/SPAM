@@ -279,3 +279,19 @@ def create_tree(dict_bitmap, dict_support, ordered_list_of_words, min_sup=2, lim
 
     # print("tree", dict_bitmap)
     return dict_bitmap, dict_support
+
+
+def dataset_transformation(dataset_Cid_Tid):
+    dataset = dict()
+    current_customer = 1
+    dataset[current_customer] = list()
+    for line in dataset_Cid_Tid:
+        if line[0] == current_customer:
+            # append with current element
+            # append with current element
+            dataset.get(current_customer).append(line[2])
+            dataset[current_customer] = dataset.get(current_customer)
+        else:
+            current_customer = line[0]
+            dataset[current_customer] = [line[2]]
+    return dataset
