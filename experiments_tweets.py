@@ -87,7 +87,7 @@ def run_experiment_ispam(dataset_Cid_Tid, list_of_words, minSup):
     return executionTime
 
 
-def load_dataset(number_of_tweets):
+def load_dataset(number_of_tweets=float('inf')):
     dataset_Cid_Tid, word_list, dict_usernames = read_twitter_csv_into_dataset(number_of_tweets=number_of_tweets)
     # sorting
     sorted_dataset_Cid_Tid = sort_and_anonymize_dataset(dataset_Cid_Tid, dict_usernames,
@@ -99,24 +99,22 @@ def load_dataset(number_of_tweets):
 if __name__ == "__main__":
     # nltk.download('stopwords')
 
-    dict_runtimes = dict()
+    # small dataset
+    sorted_dataset_Cid_Tid_100, word_list_100 = load_dataset(number_of_tweets=100)
+    # medium dataset
+    sorted_dataset_Cid_Tid_1000, word_list_1000 = load_dataset(number_of_tweets=1000)
+    # large dataset
 
     ### experiment 2
     # try SPAM algorithm with first 100 tweets and minimum support of 5
 
-    sorted_dataset_Cid_Tid_100, word_list_100 = load_dataset(number_of_tweets=100)
     minSup_2 = 5
-    # here is 2 enough because in data set there are not more than two transactions per tweet user
-    max_number_sequence_2 = 2
 
     # SPAM
     spam_runtime = run_experiment(sorted_dataset_Cid_Tid_100, word_list_100, minSup_2)
 
     # ISPAM
     ispam_runtime = run_experiment_ispam(sorted_dataset_Cid_Tid_100, word_list_100, minSup_2)
-
-    dict_runtimes["experiment_2_spam"] = spam_runtime
-    dict_runtimes["experiment_2_ispam"] = ispam_runtime
 
     ### experiment 3: DOESN'T WORK
     # try SPAM algorithm with all tweets and minSup of 50
@@ -126,31 +124,20 @@ if __name__ == "__main__":
 
     ### experiment 4:
     # try SPAM algorithm with first 1000 tweets and minimum support of 50
-    dataset_Cid_Tid_1000, word_list_1000, dict_usernames_1000 = read_twitter_csv_into_dataset(number_of_tweets=1000)
-    sorted_dataset_Cid_Tid_1000 = sort_and_anonymize_dataset(dataset_Cid_Tid_1000, dict_usernames_1000)
-    word_list_1000 = sorted(word_list_1000)
 
     minSup_4 = 50
-    # one person with 27 tweets, next most tweets from one person are 9
-    max_number_sequence_4 = 9
+
     # SPAM
     spam_runtime = run_experiment(sorted_dataset_Cid_Tid_1000, word_list_1000, minSup_4)
     # ISPAM
     ispam_runtime = run_experiment_ispam(sorted_dataset_Cid_Tid_1000, word_list_1000, minSup_4)
-
-    dict_runtimes["experiment_4_spam"] = spam_runtime
-    dict_runtimes["experiment_4_ispam"] = ispam_runtime
 
     ### experiment 5:
     # try SPAM algorithm with first 1000 tweets and minimum support of 30
 
     minSup_5 = 30
     # SPAM
-    run_experiment(sorted_dataset_Cid_Tid_1000, word_list_1000, minSup_5)
+    spam_runtime = run_experiment(sorted_dataset_Cid_Tid_1000, word_list_1000, minSup_5)
     # ISPAM
-    run_experiment_ispam(sorted_dataset_Cid_Tid_1000, word_list_1000, minSup_5)
+    ispam_runtime = run_experiment_ispam(sorted_dataset_Cid_Tid_1000, word_list_1000, minSup_5)
 
-    spam_runtime = dict_runtimes["experiment_5_spam"] = spam_runtime
-    ispam_runtime = dict_runtimes["experiment_5_ispam"] = ispam_runtime
-
-    print(dict_runtimes)
