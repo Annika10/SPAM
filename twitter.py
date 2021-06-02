@@ -54,7 +54,7 @@ def sort_and_anonymize_dataset(dataset_Cid_Tid, dict_of_usernames, customer_star
 
 
 # [0] = username, [9] = tweet
-def read_twitter_csv_into_dataset(username=0, tweet=9, number_of_tweets=100):
+def read_twitter_csv_into_dataset(username=0, tweet=9, number_of_tweets=float('inf')):
     """
     reads the data out of the csv into a dataset (list)
     in addition all words are collected and a dictionary of usernames is created with the number of tweets for each user
