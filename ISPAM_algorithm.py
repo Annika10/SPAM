@@ -4,9 +4,7 @@ from typing import Any
 from SPAM_algorithm import check_support
 
 
-def init_bit_appering_and_first_position_sequences(dataset_sequences: dict[int, list[list[str]]],
-                                                   list_of_words: list[str]) \
-        -> tuple[dict[Any, ndarray], dict[Any, ndarray], dict[Any, dict[Any, ndarray]]]:
+def init_bit_appering_and_first_position_sequences(dataset_sequences, list_of_words):
     """
 
     :param dataset_sequences:
@@ -33,8 +31,7 @@ def init_bit_appering_and_first_position_sequences(dataset_sequences: dict[int, 
     return appear_dict, fp_dict, bit_dict
 
 
-def initialise_zero_sequences(dataset_sequences: dict[int, list[list[str]]], list_of_words: list[str]) \
-        -> tuple[dict[Any, ndarray], dict[Any, ndarray], dict[Any, dict[Any, ndarray]]]:
+def initialise_zero_sequences(dataset_sequences, list_of_words):
     """
 
     :param dataset_sequences:
@@ -58,7 +55,7 @@ def initialise_zero_sequences(dataset_sequences: dict[int, list[list[str]]], lis
     return appear_dict, fp_dict, bit_dict
 
 
-def I_SPAM_algorithm(appear_dict: dict[Any, ndarray], min_sup, dataset_sequences, bit_dict, fp_dict):
+def I_SPAM_algorithm(appear_dict, min_sup, dataset_sequences, bit_dict, fp_dict):
     list_l = list()
     appear_dict_copy = appear_dict.copy()
     for itemk, value_app in appear_dict.items():

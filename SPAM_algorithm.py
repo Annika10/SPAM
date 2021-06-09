@@ -187,9 +187,49 @@ def create_wordcloud(dict_support):
     plt.show()
 
 
+def spam_algorithm(dict_bitmap, dict_support, min_sup=2):
+    list_l = dict_bitmap.keys()
+    global dict_bitmap_global
+    dict_bitmap_global = dict_bitmap.copy()
+    for node_n in list_l:
+        s_n = list_l
+        i_n = [x for x in list_l if x > node_n]
+        dict_support = dfs_pruning(node_n, s_n, i_n, dict_support, min_sup)
+    return dict_bitmap_global, dict_support
+
+
+def dfs_pruning(node_n, s_n, i_n, dict_support, min_sup):
+    s_temp, i_temp = list(), list()
+
+    # s-step
+    for i in s_n:
+        new_sequence_array = s_step_two_elements(dict_bitmap_global[node_n], dict_bitmap_global[i])
+        if check_support(new_sequence_array) >= min_sup:
+            s_temp.append(i)
+            dict_bitmap_global[node_n + i] = new_sequence_array
+            dict_support[node_n + i] = check_support(new_sequence_array)
+    for i in s_temp:
+        new_i_temp = [x for x in s_temp if x > i]
+        dfs_pruning(node_n + i, s_temp, new_i_temp, dict_support, min_sup)
+
+    # i-step
+    for i in i_n:
+        str_index = node_n[:-1] + ',' + i[1:]
+        new_item_array = i_step_two_elements(dict_bitmap_global[node_n], dict_bitmap_global[i])
+        if check_support(new_item_array) >= min_sup:
+            i_temp.append(i)
+            dict_bitmap_global[str_index] = new_item_array
+            dict_support[str_index] = check_support(new_item_array)
+    for i in i_temp:
+        new_i_temp = [x for x in i_temp if x > i]
+        dfs_pruning(node_n[:-1] + ',' + i[1:], s_temp, new_i_temp, dict_support, min_sup)
+
+    return dict_support
+
+
 def create_tree(dict_bitmap, dict_support, ordered_list_of_words, min_sup=2, limit=3):
     """
-    creates the tree with frequent sequences as a dictionariy
+    creates the tree with frequent sequences as a dictionary
     :param dict_bitmap: a dictionary where the key are the lexicographic representation (e.g. [a]) and the values is the bitmap representation
     :param ordered_list_of_words: list of possible words
     :param limit: number of possible sequences in tree

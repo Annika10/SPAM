@@ -1,5 +1,6 @@
 from experiments_tweets import run_experiment
 
+from SPAM_algorithm import bitmap_representation, spam_algorithm
 
 if __name__ == "__main__":
     ### experiment 1
@@ -26,4 +27,4 @@ if __name__ == "__main__":
     ]
     ordered_list_of_words = ['a', 'b', 'c', 'd']
 
-    run_experiment(dataset_Cid_Tid, ordered_list_of_words, minSup, max_number_sequence)
+    run_experiment(dataset_Cid_Tid, ordered_list_of_words, minSup)
