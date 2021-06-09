@@ -27,4 +27,4 @@ if __name__ == "__main__":
     ]
     ordered_list_of_words = ['a', 'b', 'c', 'd']
 
-    run_experiment(dataset_Cid_Tid, ordered_list_of_words, minSup)
+    run_experiment(dataset_Cid_Tid, ordered_list_of_words, minSup, plot=True)

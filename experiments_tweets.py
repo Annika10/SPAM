@@ -36,7 +36,7 @@ def run_experiment_old(sorted_dataset_Cid_Tid, word_list, minSup, max_number_seq
     return executionTime
 
 
-def run_experiment(sorted_dataset_Cid_Tid, word_list, minSup):
+def run_experiment(sorted_dataset_Cid_Tid, word_list, minSup, plot=False):
     """
 
     :param sorted_dataset_Cid_Tid:
@@ -62,12 +62,13 @@ def run_experiment(sorted_dataset_Cid_Tid, word_list, minSup):
     # print("spam", dict_support)
     print("spam", len(frequent_sequences))
 
-    # plot_frequent_sequence(dict_support)
-    # create_wordcloud(dict_support)
+    if plot:
+        plot_frequent_sequence(dict_support)
+        create_wordcloud(dict_support)
     return executionTime
 
 
-def run_experiment_ispam(dataset_Cid_Tid, list_of_words, minSup):
+def run_experiment_ispam(dataset_Cid_Tid, list_of_words, minSup, plot=False):
     startTime = time.time()
 
     dataset_sequences = dataset_transformation(dataset_Cid_Tid)
@@ -82,8 +83,9 @@ def run_experiment_ispam(dataset_Cid_Tid, list_of_words, minSup):
     # print("ispam", dict_support)
     print("ispam", len(frequent_sequences))
 
-    # plot_frequent_sequence(dict_support)
-    # create_wordcloud(dict_support)
+    if plot:
+        plot_frequent_sequence(dict_support)
+        create_wordcloud(dict_support)
     return executionTime
 
 
@@ -104,6 +106,7 @@ if __name__ == "__main__":
     # medium dataset
     sorted_dataset_Cid_Tid_1000, word_list_1000 = load_dataset(number_of_tweets=1000)
     # large dataset
+    sorted_dataset_Cid_Tid_10000, word_list_10000 = load_dataset(number_of_tweets=10000)
 
     ### experiment 2
     # try SPAM algorithm with first 100 tweets and minimum support of 5
@@ -128,9 +131,9 @@ if __name__ == "__main__":
     minSup_4 = 50
 
     # SPAM
-    spam_runtime = run_experiment(sorted_dataset_Cid_Tid_1000, word_list_1000, minSup_4)
+    spam_runtime = run_experiment(sorted_dataset_Cid_Tid_1000, word_list_1000, minSup_4, plot=True)
     # ISPAM
-    ispam_runtime = run_experiment_ispam(sorted_dataset_Cid_Tid_1000, word_list_1000, minSup_4)
+    ispam_runtime = run_experiment_ispam(sorted_dataset_Cid_Tid_1000, word_list_1000, minSup_4, plot=True)
 
     ### experiment 5:
     # try SPAM algorithm with first 1000 tweets and minimum support of 30
@@ -140,4 +143,13 @@ if __name__ == "__main__":
     spam_runtime = run_experiment(sorted_dataset_Cid_Tid_1000, word_list_1000, minSup_5)
     # ISPAM
     ispam_runtime = run_experiment_ispam(sorted_dataset_Cid_Tid_1000, word_list_1000, minSup_5)
+
+    ### experiment 6:
+    # try SPAM algorithm with first 10000 tweets and minimum support of 200
+
+    minSup_6 = 200
+    # SPAM
+    spam_runtime = run_experiment(sorted_dataset_Cid_Tid_10000, word_list_10000, minSup_6, plot=True)
+    # ISPAM
+    ispam_runtime = run_experiment_ispam(sorted_dataset_Cid_Tid_10000, word_list_10000, minSup_6, plot=True)
 

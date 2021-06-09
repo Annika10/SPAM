@@ -9,12 +9,12 @@ def plot_analysis(x_list, dataset_name, xlabel):
     y_ispam_runtime = list()
 
     # SPAM
-    with open('spam_' + dataset_name + '.csv') as csv_file:
+    with open('results/spam_' + dataset_name + '.csv') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in csv_reader:
             y_spam_runtime.append(row[1])
     # ISPAM
-    with open('ispam_' + dataset_name + '.csv') as csv_file:
+    with open('results/ispam_' + dataset_name + '.csv') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in csv_reader:
             y_ispam_runtime.append(row[1])

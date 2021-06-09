@@ -120,4 +120,4 @@ if __name__ == "__main__":
 
     analysis_to_csv_for_saving(dict_len, "lenT", minSup=75)
 
-    plot_analysis([9, 10, 11, 12, 13], "lenT", "length of tweet")
+    plot_analysis([9, 10, 11, 12], "lenT", "length of tweet")
