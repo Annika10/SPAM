@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 import csv
 
 
-def plot_analysis(minSup_list, dataset_name):
+def plot_analysis(x_list, dataset_name, xlabel):
     y_spam_runtime = list()
     y_ispam_runtime = list()
 
@@ -22,13 +22,13 @@ def plot_analysis(minSup_list, dataset_name):
     y_spam_runtime = [float(x) for x in y_spam_runtime]
     y_ispam_runtime = [float(x) for x in y_ispam_runtime]
 
-    plt.plot(minSup_list, y_spam_runtime, marker="o", label='spam')
-    plt.plot(minSup_list, y_ispam_runtime, marker="o", label='ispam')
+    plt.plot(x_list, y_spam_runtime, marker="o", label='spam')
+    plt.plot(x_list, y_ispam_runtime, marker="o", label='ispam')
 
     # Add title and axis names
     plt.title('Runtime for ' + dataset_name + ' dataset for different supports')
-    plt.xlabel('support')
-    plt.ylabel('runtime')
+    plt.xlabel(xlabel)
+    plt.ylabel('runtime in seconds')
     plt.legend()
 
     plt.show()
@@ -71,14 +71,17 @@ if __name__ == "__main__":
     # medium dataset
     sorted_dataset_Cid_Tid_1000, word_list_1000 = load_dataset(number_of_tweets=1000)
     # large dataset
-    # TODO add
+    sorted_dataset_Cid_Tid_10000, word_list_10000 = load_dataset(number_of_tweets=10000)
 
     minSup_small = [5, 6, 7, 8, 9, 10]
     minSup_medium = [50, 60, 70, 80, 90, 100]
-    # TODO minSup_large
+    minSup_large = [500, 600, 700, 800, 900, 1000]
 
     analysis_to_csv_for_saving(minSup_small, sorted_dataset_Cid_Tid_100, word_list_100, "small")
-    plot_analysis(minSup_small, "small")
+    plot_analysis(minSup_small, "small", "minimum support")
 
     analysis_to_csv_for_saving(minSup_medium, sorted_dataset_Cid_Tid_1000, word_list_1000, "medium")
-    plot_analysis(minSup_medium, "medium")
+    plot_analysis(minSup_medium, "medium", "minimum support")
+
+    analysis_to_csv_for_saving(minSup_large, sorted_dataset_Cid_Tid_10000, word_list_10000, "large")
+    plot_analysis(minSup_large, "large", "minimum support")

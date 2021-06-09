@@ -58,7 +58,7 @@ def run_experiment(sorted_dataset_Cid_Tid, word_list, minSup):
 
     executionTime = (time.time() - startTime)
     print('Execution time in seconds for SPAM: ' + str(executionTime))
-    # print("spam", frequent_sequences)
+    print("spam", frequent_sequences)
     # print("spam", dict_support)
     print("spam", len(frequent_sequences))
 
