@@ -1,11 +1,10 @@
 from ISPAM_algorithm import init_bit_appering_and_first_position_sequences, I_SPAM_algorithm
 from SPAM_algorithm import get_frequent_sequences, dataset_transformation
-from experiments_tweets import run_experiment
+from experiments_tweets import run_experiment, run_experiment_ispam
 
 
 if __name__ == "__main__":
     minSup = 2
-    max_number_sequence = 2
 
     # example dataset from paper
     # dataset_sequences = {
@@ -37,14 +36,7 @@ if __name__ == "__main__":
 
     list_of_words = ['a', 'b', 'c', 'd', 'e']
 
-    dataset_sequences = dataset_transformation(dataset_Cid_Tid)
-
-    appear_dict, fp_dict, bit_dict = init_bit_appering_and_first_position_sequences(dataset_sequences, list_of_words)
-
-    appear_dict, fp_dict, dict_support = I_SPAM_algorithm(appear_dict, minSup, dataset_sequences, bit_dict, fp_dict)
-    frequent_sequences = get_frequent_sequences(appear_dict)
-    print(frequent_sequences)
-    print(dict_support)
+    run_experiment_ispam(dataset_Cid_Tid, list_of_words, minSup, plot=True)
 
     # compare SPAM
     # run_experiment(dataset_Cid_Tid, list_of_words, minSup, max_number_sequence)

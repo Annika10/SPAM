@@ -1,6 +1,7 @@
 from SPAM_algorithm import bitmap_representation, create_tree, get_frequent_sequences, plot_frequent_sequence, create_wordcloud, dataset_transformation, spam_algorithm
 from twitter import read_twitter_csv_into_dataset, sort_and_anonymize_dataset
 from ISPAM_algorithm import init_bit_appering_and_first_position_sequences, I_SPAM_algorithm
+from tree import create_tree_visualisation
 
 import time
 
@@ -63,8 +64,10 @@ def run_experiment(sorted_dataset_Cid_Tid, word_list, minSup, plot=False):
     print("spam", len(frequent_sequences))
 
     if plot:
-        plot_frequent_sequence(dict_support)
-        create_wordcloud(dict_support)
+        # plot_frequent_sequence(dict_support)
+        # create_wordcloud(dict_support)
+        print(dict_support.keys())
+        create_tree_visualisation(dict_support.keys())
     return executionTime
 
 
@@ -84,8 +87,10 @@ def run_experiment_ispam(dataset_Cid_Tid, list_of_words, minSup, plot=False):
     print("ispam", len(frequent_sequences))
 
     if plot:
-        plot_frequent_sequence(dict_support)
-        create_wordcloud(dict_support)
+        # plot_frequent_sequence(dict_support)
+        # create_wordcloud(dict_support)
+        print(dict_support)
+        create_tree_visualisation(dict_support.keys())
     return executionTime
 
 
