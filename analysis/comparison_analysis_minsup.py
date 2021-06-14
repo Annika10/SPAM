@@ -99,10 +99,9 @@ if __name__ == "__main__":
     minSup_large = [500, 600, 700, 800, 900, 1000]
 
     analysis_to_csv_for_saving(minSup_small, sorted_dataset_Cid_Tid_100, word_list_100, "small")
-    #plot_analysis(minSup_small, "small", "minimum support")
-
     analysis_to_csv_for_saving(minSup_medium, sorted_dataset_Cid_Tid_1000, word_list_1000, "medium")
-    #plot_analysis(minSup_medium, "medium", "minimum support")
-
     analysis_to_csv_for_saving(minSup_large, sorted_dataset_Cid_Tid_10000, word_list_10000, "large")
-    #plot_analysis(minSup_large, "large", "minimum support")
+
+    plot_analysis(minSup_small, "small", "minimum support")
+    plot_analysis(minSup_medium, "medium", "minimum support")
+    plot_analysis(minSup_large, "large", "minimum support")

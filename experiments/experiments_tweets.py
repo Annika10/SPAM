@@ -93,7 +93,7 @@ if __name__ == "__main__":
     # medium dataset
     # sorted_dataset_Cid_Tid_1000, word_list_1000 = load_dataset(number_of_tweets=1000)
     # large dataset
-    sorted_dataset_Cid_Tid_10000, word_list_10000 = load_dataset(number_of_tweets=10000)
+    # sorted_dataset_Cid_Tid_10000, word_list_10000 = load_dataset(number_of_tweets=10000)
 
     ### experiment 2
     # try SPAM algorithm with first 100 tweets and minimum support of 5
@@ -110,7 +110,7 @@ if __name__ == "__main__":
     # try SPAM algorithm with all tweets and minSup of 50
     minSup_3 = 10000
     dataset_Cid_Tid_all, word_list_all = load_dataset(number_of_tweets=float('inf'))
-    ispam_runtime = run_experiment_ispam(dataset_Cid_Tid_all, word_list_all, minSup=minSup_3)
+    ispam_runtime = run_experiment_ispam(dataset_Cid_Tid_all, word_list_all, minSup=minSup_3, plot=True, name='experiment3')
     #
     ### experiment 4:
     # try SPAM algorithm with first 1000 tweets and minimum support of 50
