@@ -1,6 +1,9 @@
 import csv
 from nltk.corpus import stopwords
 import re
+import os
+import sys
+from pathlib import Path
 
 
 def remove_stopwords(tweet_list):
@@ -54,7 +57,7 @@ def sort_and_anonymize_dataset(dataset_Cid_Tid, dict_of_usernames, customer_star
 
 
 # [0] = username, [9] = tweet
-def read_twitter_csv_into_dataset(username=0, tweet=9, number_of_tweets=float('inf')):
+def read_twitter_csv_into_dataset(username=7, tweet=10, number_of_tweets=float('inf')):
     """
     reads the data out of the csv into a dataset (list)
     in addition all words are collected and a dictionary of usernames is created with the number of tweets for each user
@@ -67,8 +70,9 @@ def read_twitter_csv_into_dataset(username=0, tweet=9, number_of_tweets=float('i
     dict_of_usernames = dict()
     word_list = list()
 
-    with open('covid19_tweets.csv', encoding='utf-8') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
+    parent_path = Path(sys.path[0]).parent
+    with open(os.path.join(parent_path, 'data/covid.csv'), encoding='utf-8') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=';')
         line_count = 0
         for row in csv_reader:
             if line_count == 0:
@@ -82,7 +86,6 @@ def read_twitter_csv_into_dataset(username=0, tweet=9, number_of_tweets=float('i
                 tweet_str = re.sub("http(\S)*", "", row[tweet].lower())
                 tweet_list = re.split('\s|,|\.', tweet_str)
                 tweet_list = remove_stopwords(tweet_list)
-                # TODO: sorted right?
                 tweet_list = sorted(tweet_list)
 
                 if username_string not in dict_of_usernames.keys():
