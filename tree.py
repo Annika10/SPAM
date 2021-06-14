@@ -1,7 +1,15 @@
 import pydot
+import os
+import sys
+from pathlib import Path
 
 
-def create_tree_visualisation(nodes):
+def create_tree_visualisation(nodes, name):
+    """
+    create a visualisation of the frequent sequences
+    :param nodes: frequent sequences
+    :return: None
+    """
     dict_levels = get_dict_levels(nodes)
     dict_successors = get_dict_successors(dict_levels)
 
@@ -18,12 +26,17 @@ def create_tree_visualisation(nodes):
         for successors in dict_successors[node]:
             graph.add_edge(pydot.Edge(node, successors))
 
-
-    graph.write_raw('tree.dot')
-    #graph.write_png('output.png')
+    parent_path = Path(sys.path[0]).parent
+    graph.write_raw(os.path.join(parent_path, 'results/tree' + name + '.dot'))
+    #graph.write_png(os.path.join(parent_path, 'plots_new/tree' + name + '.png'))
 
 
 def get_dict_levels(nodes):
+    """
+    create a dictionary which stores the nodes of each level
+    :param nodes: frequent sequences
+    :return: dictionary
+    """
     dict_levels = dict()
     nodes = list(nodes)
     for element in nodes:
@@ -41,6 +54,11 @@ def get_dict_levels(nodes):
 
 
 def get_dict_successors(dict_levels):
+    """
+    create a dictionary which stores for each node it successors
+    :param dict_levels: dictionary which stores the nodes of each level
+    :return: dictionary
+    """
     dict_successors = dict()
 
     level = 1

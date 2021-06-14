@@ -8,7 +8,8 @@ def bitmap_representation(dataset, list_of_words, min_sup=2):
     create a bitmap representation (as numpy array) from dataset
     :param dataset: dataset in format cid, tid, elements
     :param list_of_words: list of possible words which can occur
-    :return: bitmap representation of data set
+    :param min_sup: minimum support
+    :return: bitmap representation of data set, dictionary with support of each frequent sequence
     """
 
     ### bitmap representation is always 2^x
@@ -36,7 +37,7 @@ def bitmap_representation(dataset, list_of_words, min_sup=2):
         else:
             customer = item[0]
             # set number of transactions for new customer to zero
-            current_number_sequences = 0
+            current_number_sequences = 1
             countercustomer += 1
 
     # get next 2 power of highest number of transactions for bitmap representation
@@ -98,7 +99,6 @@ def s_step_two_elements(first_array, second_array):
         # all indexes higher k have value 1
         for index in range(k + 1, len(sub_array)):
             transformed_first_array[index_subarray][index] = 1
-    # TODO: fix like in paper, but why like this in paper?!
     # print("inversed_first_array", transformed_first_array)
 
     ### bitwise and of first and second array
@@ -181,13 +181,20 @@ def create_wordcloud(dict_support):
     plots wordcloud of frequent sequences
     :param dict_support: dictionary with frequent sequences and their support
     """
-    wordcloud = WordCloud(background_color="white",width=1920, height=1080).generate_from_frequencies(dict_support)
+    wordcloud = WordCloud(background_color="white", width=1920, height=1080).generate_from_frequencies(dict_support)
     plt.imshow(wordcloud, interpolation="bilinear")
     plt.axis("off")
     plt.show()
 
 
 def spam_algorithm(dict_bitmap, dict_support, min_sup=2):
+    """
+    run spam algorith
+    :param dict_bitmap: bitmap representation
+    :param dict_support: dict stores support of all frequent sequences
+    :param min_sup: minimum support
+    :return: bitmap representation, dict with support
+    """
     list_l = dict_bitmap.keys()
     global dict_bitmap_global
     dict_bitmap_global = dict_bitmap.copy()
@@ -199,6 +206,15 @@ def spam_algorithm(dict_bitmap, dict_support, min_sup=2):
 
 
 def dfs_pruning(node_n, s_n, i_n, dict_support, min_sup):
+    """
+    depth first search
+    :param node_n: current sequence
+    :param s_n: possible sequence extensions
+    :param i_n: possible item extensions
+    :param dict_support: dict which stores support of all frequent sequences
+    :param min_sup: minimum support
+    :return: dict which stores support of all frequent sequences
+    """
     s_temp, i_temp = list(), list()
 
     # s-step
@@ -227,101 +243,12 @@ def dfs_pruning(node_n, s_n, i_n, dict_support, min_sup):
     return dict_support
 
 
-def create_tree(dict_bitmap, dict_support, ordered_list_of_words, min_sup=2, limit=3):
-    """
-    creates the tree with frequent sequences as a dictionary
-    :param dict_bitmap: a dictionary where the key are the lexicographic representation (e.g. [a]) and the values is the bitmap representation
-    :param ordered_list_of_words: list of possible words
-    :param limit: number of possible sequences in tree
-    :param min_sup: number of minimum support
-    :return: extended dictionary with bitmap representation
-    """
-    # dummy bitmap for checking if more extensions are possible
-    old_dict_bitmap = dict()
-
-    # mark which indexes are already passed by
-    already_passed_indexes = 0
-
-    # while not all nodes are extended
-    while not old_dict_bitmap.keys() == dict_bitmap.keys():
-
-        # current keys of bitmap
-        keys = list(dict_bitmap.keys())
-        # print("keys", keys)
-
-        # create new dictionary where new added extensions are stored
-        new_dict_bitmap = dict_bitmap.copy()
-
-        # pruning is done by only consider frequent sequences as first element
-        for current_index in range(already_passed_indexes, len(keys)):
-
-            # get bitmap/array of current considered element in the dictionary
-            first_dict_index = keys[current_index]
-            # print("current_index", first_dict_index)
-            first_array = dict_bitmap[first_dict_index]
-
-            # check all extensions with right side of tree
-            for word in ordered_list_of_words:
-
-                # second considered element
-                current_word = '[' + word + ']'
-
-                # break for more than 3 sequences
-                if (first_dict_index.count('[') + word.count('[')) > limit:
-                    break
-
-                ### s-step extension
-                # name of new sequence
-                new_s_step_extended_sequence = first_dict_index + current_word
-                # count number of sequences
-                number_sequence = new_s_step_extended_sequence.count('[')
-                # if new extension doesn't exists until know and there aren't too many sequence, do extension
-                if not new_s_step_extended_sequence in keys and number_sequence <= limit:
-                    # ("new s-step extension", new_s_step_extended_sequence)
-                    # get bitmap/array of second element (extension)
-                    second_array = dict_bitmap[current_word]
-                    # perform s-step extension
-                    new_sequence_array = s_step_two_elements(first_array, second_array)
-                    current_support = check_support(new_sequence_array)
-                    if current_support >= min_sup:
-                        # add to dictionary
-                        new_dict_bitmap[new_s_step_extended_sequence] = new_sequence_array
-                        dict_support[new_s_step_extended_sequence] = current_support
-
-
-                ### i-step extension
-                list_of_current_index = first_dict_index.split("[")
-                get_last_sequence = list_of_current_index[-1][:-1]
-                # TODO: change compare operation for real words
-                if word not in get_last_sequence and word > get_last_sequence.split(",")[-1]:
-                    leading_part = ''
-                    for i in range(len(list_of_current_index) - 1):
-                        if list_of_current_index[i]:
-                            leading_part = leading_part + '[' + list_of_current_index[i]
-
-                    # name of new sequence
-                    new_i_step_extended_sequence = leading_part + '[' + get_last_sequence + ',' + word + ']'
-                    # print("new i-step extension", new_i_step_extended_sequence)
-                    # get bitmap/array of second element (extension)
-                    second_array = dict_bitmap['[' + word + ']']
-                    # perform i-step extension
-                    new_item_array = i_step_two_elements(first_array, second_array)
-                    current_support = check_support(new_item_array)
-                    if current_support >= min_sup:
-                        # add to dictionary
-                        new_dict_bitmap[new_i_step_extended_sequence] = new_item_array
-                        dict_support[new_i_step_extended_sequence] = current_support
-
-        # check if there are any new additions to the dictionary
-        already_passed_indexes = len(dict_bitmap)
-        old_dict_bitmap = dict_bitmap.copy()
-        dict_bitmap = new_dict_bitmap.copy()
-
-    # print("tree", dict_bitmap)
-    return dict_bitmap, dict_support
-
-
 def dataset_transformation(dataset_Cid_Tid):
+    """
+    transform a dataset into a sequence dataset (needed for ISPAM)
+    :param dataset_Cid_Tid: input dataset
+    :return: transformed dataset
+    """
     dataset = dict()
     current_customer = 1
     dataset[current_customer] = list()

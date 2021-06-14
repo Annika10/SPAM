@@ -1,15 +1,13 @@
 import numpy as np
-from numpy import ndarray
-from typing import Any
 from SPAM_algorithm import check_support
 
 
 def init_bit_appering_and_first_position_sequences(dataset_sequences, list_of_words):
     """
-
-    :param dataset_sequences:
-    :param list_of_words:
-    :return:
+    initialise the appearing sequence table, first sequential position, bit sequence structure
+    :param dataset_sequences: input dataset
+    :param list_of_words: input list of words in dataset
+    :return: init appearing sequence table, first sequential position, bit sequence structure
     """
     appear_dict, fp_dict, bit_dict = initialise_zero_sequences(dataset_sequences, list_of_words)
 
@@ -33,10 +31,10 @@ def init_bit_appering_and_first_position_sequences(dataset_sequences, list_of_wo
 
 def initialise_zero_sequences(dataset_sequences, list_of_words):
     """
-
-    :param dataset_sequences:
-    :param list_of_words:
-    :return:
+    initialise the appearing sequence table, first sequential position, bit sequence structure with zeros
+    :param dataset_sequences: input dataset
+    :param list_of_words: input list of words in dataset
+    :return: init appearing sequence table, first sequential position, bit sequence structure with zeros
     """
     appear_dict = dict()
     fp_dict = dict()
@@ -56,6 +54,15 @@ def initialise_zero_sequences(dataset_sequences, list_of_words):
 
 
 def I_SPAM_algorithm(appear_dict, min_sup, dataset_sequences, bit_dict, fp_dict):
+    """
+    runs the ISPAM algorithm with init appearing sequence table, first sequential position, bit sequence structure
+    :param appear_dict: init appearing sequence table
+    :param min_sup: minimum support
+    :param dataset_sequences: dataset
+    :param bit_dict: init bit sequence structure
+    :param fp_dict: init first sequential position
+    :return: appearing sequence table, first sequential position, bit sequence structure after algorithm running
+    """
     list_l = list()
     appear_dict_copy = appear_dict.copy()
     for itemk, value_app in appear_dict.items():
@@ -89,6 +96,18 @@ def I_SPAM_algorithm(appear_dict, min_sup, dataset_sequences, bit_dict, fp_dict)
 
 
 def m_dfs(item_t, appear_dict, fp_dict, s_temp_t, min_sup, bit_dict, i_temp_t_dict, dict_support):
+    """
+    depth-first search
+    :param item_t: current element
+    :param appear_dict: appearance sequence table
+    :param fp_dict: first sequential position
+    :param s_temp_t: possible sequence extensions for current element
+    :param min_sup: minimum support
+    :param bit_dict: bit sequence structure
+    :param i_temp_t_dict: dict of possible item extensions
+    :param dict_support: stores support for each frequent sequence
+    :return: appearance sequence table, first sequential position, support of each frequent sequence dict
+    """
     appear_t = appear_dict[item_t].astype(int)
 
     # s-step
@@ -192,5 +211,10 @@ def m_dfs(item_t, appear_dict, fp_dict, s_temp_t, min_sup, bit_dict, i_temp_t_di
 
 
 def one_count(array):
+    """
+    returns the number of ones in an array
+    :param array: input array
+    :return: number of ones in array
+    """
     array_ones = np.where(array == 1)
     return np.size(array_ones)
