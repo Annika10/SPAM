@@ -28,7 +28,7 @@ def create_tree_visualisation(nodes, name):
 
     parent_path = Path(sys.path[0]).parent
     graph.write_raw(os.path.join(parent_path, 'results/tree' + name + '.dot'))
-    #graph.write_png(os.path.join(parent_path, 'plots/experiments/tree' + name + '.png'))
+    graph.write_png(os.path.join(parent_path, 'plots/experiments/tree' + name + '.png'))
 
 
 def get_dict_levels(nodes):

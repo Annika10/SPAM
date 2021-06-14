@@ -123,7 +123,7 @@ def analysis_to_csv_for_saving(dict_len, dataset_name, minSup):
 if __name__ == "__main__":
     sorted_dataset_Cid_Tid_10000, word_list_10000 = load_dataset(number_of_tweets=10000)
 
-    # analyse_dataset(sorted_dataset_Cid_Tid_10000)
+    analyse_dataset(sorted_dataset_Cid_Tid_10000)
     # result:
     # {0: 0, 1: 7, 2: 59, 3: 128, 4: 150, 5: 260, 6: 330, 7: 533, 8: 566, 9: 554, 10: 589, 11: 545, 12: 433, 13: 400, 14: 371, 15: 414, 16: 332, 17: 311, 18: 352, 19: 297, 20: 312, 21: 3057}
 
